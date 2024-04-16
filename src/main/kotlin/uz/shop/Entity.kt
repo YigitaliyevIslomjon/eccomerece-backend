@@ -73,12 +73,12 @@ class Product(
     var price: Long,
     @Column(nullable = false)
     var description: String,
-    @OneToOne()
-    var discount: Discount,
+    var discount: Long = 0,
     @ManyToOne()
     var category: Category,
-    @ManyToMany()
-    var statuses: List<Status>,
+
+    @ManyToOne()
+    var status: Status,
     @OneToMany()
     var fileAttachment: List<FileAttachment>,
     @OneToOne(mappedBy = "product", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
@@ -106,7 +106,7 @@ class Variant(
 @Entity
 class Stock(
     @OneToMany(fetch = FetchType.EAGER)
-    var value: List<Variant>,
+    var values: List<Variant>,
     @OneToOne(fetch = FetchType.LAZY)
     var product: Product? = null,
     @Column(nullable = false)
@@ -118,35 +118,42 @@ class Stock(
 @Table(uniqueConstraints = [UniqueConstraint(columnNames = ["name", "type"])])
 class Status(
     @Column(nullable = false)
-    var name: String,
+    @Enumerated(EnumType.STRING)
+    var name: StatusValue,
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var type: StatusType,
-) : BaseEntity()
-
-@Entity
-class ProductUser(
-    @ManyToOne()
-    var user: User,
-    @ManyToOne()
-    var product: Product,
 ) : BaseEntity()
 
 
 @Entity(name = "orders")
 class Order(
+    @Column(nullable = false)
+    var sum: Long,
     @ManyToOne()
     var user: User,
     @ManyToMany()
-    var statuses: List<Status> = listOf(),
-    @OneToOne()
+    var status: List<Status>,
+    @ManyToOne()
     var deliveryMethod: DeliveryMethod,
-    @OneToOne()
+    @ManyToOne()
     var paymentType: PaymentType,
-    var sum: Long,
+    @ManyToOne()
+    var address: Address,
+/*    @ManyToMany()
+    var products: List<Product>,*/
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
+    var productOrders: List<ProductOrder> = listOf()
+) : BaseEntity()
+
+@Entity()
+class ProductOrder(
     @Column(nullable = false)
-    var comment: String,
-//    var products:
-    var address: String,
+    var quantity: Long,
+    @ManyToOne()
+    var product: Product,
+    @ManyToOne()
+    var order: Order? = null,
 ) : BaseEntity()
 
 @Entity
@@ -182,19 +189,6 @@ class Address(
 
 
 @Entity
-class Review(
-    @ManyToOne()
-    var user: User,
-    @ManyToOne()
-    var product: Product,
-    @Column(nullable = false)
-    var rating: Int,
-    @Column(nullable = false)
-    var comment: String,
-) : BaseEntity()
-
-
-@Entity
 class UserCard(
     @ManyToOne()
     var user: User,
@@ -218,20 +212,6 @@ class PaymentCardType(
     var code: Int,
     @Column(nullable = false)
     var icon: String,
-) : BaseEntity()
-
-@Entity
-class Discount(
-//    @Column(nullable = false)
-//    var name: String,
-    var sum: Long? = null,
-    var precent: Long? = null,
-//    @Column(nullable = false)
-//    @Temporal(TemporalType.TIMESTAMP)
-//    var fromDate: Date,
-//    @Column(nullable = false)
-//    @Temporal(TemporalType.TIMESTAMP)
-//    var toDate: Date,
 ) : BaseEntity()
 
 

@@ -19,7 +19,8 @@ class ProductController(
     fun getOne(@PathVariable id: Long) = productService.getOne(id)
 
     @GetMapping("/pageable")
-    fun getAll(pageable: Pageable) = productService.getAll(pageable)
+    fun getAll(pageable: Pageable, @RequestParam statusId: Long?, @RequestParam  categoryId: Long?, @RequestParam search: String?) =
+        productService.getAll(pageable, statusId, categoryId, search)
 
     @PutMapping("/{id}")
     fun edit(@Valid @RequestBody dto: ProductDto, @PathVariable id: Long) = productService.edit(id, dto)

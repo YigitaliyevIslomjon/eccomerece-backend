@@ -15,6 +15,15 @@ enum class DeliveryMethodType {
 enum class StatusType {
     CATEGORY,
     ORDER,
+    PRODUCT,
+}
+
+enum class StatusValue {
+    PROCCESS,
+    PUBLISH,
+    INACTIVE,
+    SECHDULED,
+    DELIVERED
 }
 enum class CardType {
     HUMO,
@@ -46,6 +55,9 @@ enum class ErrorCode(val code: Int) {
     DELIVERY_METHOD_NOT_FOUND(115),
     PAYMENT_CARD_TYPE_NAME_EXIST(116),
     PAYMENT_CARD_TYPE_NOT_FOUND(117),
-    USER_CARD_NOT_FOUND(118)
-
+    USER_CARD_NOT_FOUND(118),
+    PRODUCT_QUANTITY_NOT_FOUND(119),
+    ORDER_NOT_FOUND(120),
+    FILE_ATTACHMENT_EXIST(121),
+    FILE_ATTACHMENT_NOT_FOUND(122)
 }

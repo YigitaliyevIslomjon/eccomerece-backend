@@ -109,6 +109,20 @@ data class VariantDto(
     var value: String,
 )
 
+data class VariantDtoResponse(
+    var attribute: String,
+    var value: String,
+) {
+    companion object {
+        fun toResponse(variant: Variant): VariantDtoResponse {
+            return VariantDtoResponse(
+                variant.attribute.name,
+                variant.value
+            )
+        }
+    }
+}
+
 data class DiscountDto(
     var sum: Long? = null,
     var percent: Long? = null,
@@ -129,11 +143,12 @@ data class ProductDto(
     var variants: List<VariantDto>,
     @field:NotNull
     var quantity: Long,
-    @field:Valid
-    var discount: DiscountDto,
+    @field:NotNull
+    var discount: Long,
     @field:NotNull
     var imgId: Long
 )
+
 
 data class ProductDtoResponse(
     var id: Long,
@@ -141,6 +156,8 @@ data class ProductDtoResponse(
     var name: String,
     var price: Long,
     var description: String,
+    var stock: StockDtoResponse,
+    var status: StatusDtoResponse
 ) {
     companion object {
         fun toResponse(product: Product): ProductDtoResponse {
@@ -150,6 +167,8 @@ data class ProductDtoResponse(
                 product.name,
                 product.price,
                 product.description,
+                StockDtoResponse.toResponse(product.stock!!),
+                StatusDtoResponse.toResponse(product.status)
             )
         }
     }
@@ -211,23 +230,21 @@ data class StockDto(
 
 data class StockDtoResponse(
     var id: Long,
-    var value: List<Variant>,
-    var product: Product?,
+    var values: List<VariantDtoResponse>,
     var quantity: Long,
 ) {
     companion object {
         fun toResponse(stock: Stock): StockDtoResponse {
             return StockDtoResponse(
                 stock.id!!,
-                stock.value,
-                stock.product,
+                stock.values.map(VariantDtoResponse.Companion::toResponse),
                 stock.quantity
             )
         }
     }
 }
 
-//
+
 //data class ProductUserDto(
 //    @field:NotNull
 //    var userId: Long,
@@ -301,23 +318,49 @@ data class OrderDto(
 
 data class OrderDtoResponse(
     var id: Long,
-    var deliveryMethodId: Long,
-    var paymentTypeId: Long,
+    var deliveryMethod: DeliveryMethodDtoResponse,
+    var paymentType: PaymentTypeDtoResponse,
     var sum: Long? = null,
-    var comment: String,
-//    @field:NotEmpty
-//    var products: List<>
-    var address: String,
+    var address: AddressDtoResponse,
+    var status: List<StatusDtoResponse>,
+    var productOrderes: List<ProductOrderDtoResponse>
+
 ) {
     companion object {
         fun toResponse(order: Order): OrderDtoResponse {
             return OrderDtoResponse(
                 order.id!!,
-                order.deliveryMethod.id!!,
-                order.paymentType.id!!,
+                DeliveryMethodDtoResponse.toResponse(order.deliveryMethod),
+                PaymentTypeDtoResponse.toResponse(order.paymentType),
                 order.sum,
-                order.comment,
-                order.address
+                AddressDtoResponse.toResponse(order.address),
+                order.status.map(StatusDtoResponse.Companion::toResponse),
+                order.productOrders.map(ProductOrderDtoResponse.Companion::toResponse)
+            )
+        }
+    }
+}
+
+
+data class ProductOrderDtoResponse(
+    var id: Long,
+    var categoryId: Long,
+    var name: String,
+    var price: Long,
+    var description: String,
+    var stock: StockDtoResponse,
+    var status: StatusDtoResponse
+) {
+    companion object {
+        fun toResponse(productOrder: ProductOrder): ProductOrderDtoResponse {
+            return ProductOrderDtoResponse(
+                productOrder.product.id!!,
+                productOrder.product.category.id!!,
+                productOrder.product.name,
+                productOrder.product.price,
+                productOrder.product.description,
+                StockDtoResponse.toResponse(productOrder.product.stock!!),
+                StatusDtoResponse.toResponse(productOrder.product.status)
             )
         }
     }
@@ -362,15 +405,13 @@ data class AddressDtoResponse(
 }
 
 data class StatusDto(
-    @field:NotBlank
-    var name: String,
-    @field:Enumerated
+    var name: StatusValue,
     var type: StatusType
 )
 
 data class StatusDtoResponse(
     var id: Long,
-    var name: String,
+    var name: StatusValue,
     var type: StatusType
 ) {
     companion object {
@@ -383,81 +424,6 @@ data class StatusDtoResponse(
         }
     }
 }
-
-@Entity
-class ReviewDto(
-    @field:NotNull
-    var userId: Long,
-    @field:NotNull
-    var productId: Long,
-    @field:NotNull
-    var rating: Int,
-    @field:NotBlank
-    var comment: String,
-) : BaseEntity()
-
-data class ReviewDtoResponse(
-    var id: Long,
-    var userId: Long,
-    var productId: Long,
-    var rating: Int,
-    var comment: String,
-) {
-    companion object {
-        fun toResponse(review: Review): ReviewDtoResponse {
-            return ReviewDtoResponse(
-                review.id!!,
-                review.user.id!!,
-                review.product.id!!,
-                review.rating,
-                review.comment
-            )
-        }
-    }
-}
-
-/*
-class DiscountDto(
-    @field:NotNull
-    var productId: Long,
-    @field:NotBlank
-    var name: String,
-    @field:NotNull
-    var sum: Long,
-    @field:NotNull
-    var precent: Long,
-    @field:NotBlank
-    var from: Date,
-    @field:NotBlank
-    var to: Date,
-)
-*/
-
-/*
-class DiscountDtoResponse(
-    var id: Long,
-    var productId: Long,
-    var name: String,
-    var sum: Long,
-    var precent: Long,
-    var fromDate: Date,
-    var toDate: Date,
-) {
-    companion object {
-        fun toResponse(discount: Discount): DiscountDtoResponse {
-            return DiscountDtoResponse(
-                discount.id!!,
-                discount.product.id!!,
-                discount.name,
-                discount.sum,
-                discount.precent,
-                discount.fromDate,
-                discount.toDate
-            )
-        }
-    }
-}
-*/
 
 data class FileAttachmentDtoResponse(
     val id: Long,

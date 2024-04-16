@@ -19,7 +19,7 @@ class StatusServiceImpl(
 ) : StatusService {
     override fun add(dto: StatusDto): Result = dto.run {
 
-        if (statusRepository.existsByNameAndType(name, type)) {
+        if (statusRepository.findByNameAndType(name, type) != null) {
             throw StatusAndTypeExistException("name $name and type $type already exist")
         }
         statusRepository.save(
@@ -39,7 +39,7 @@ class StatusServiceImpl(
 
     override fun edit(id: Long, dto: StatusDto): Result = dto.run {
         val status = statusRepository.findByIdOrNull(id) ?: throw StatusNotFoundException("status id $id not found")
-        if (status.name != name && status.type != type && statusRepository.existsByNameAndType(name, type)) {
+        if (status.name != name && status.type != type && statusRepository.findByNameAndType(name, type) != null) {
             throw StatusAndTypeExistException("name $name and type $type already exist")
         }
         status.name = name
@@ -50,7 +50,6 @@ class StatusServiceImpl(
 
     override fun getAll(pageable: Pageable): List<StatusDtoResponse> =
         statusRepository.findAll().map(StatusDtoResponse.Companion::toResponse)
-
 
     override fun delete(id: Long): Result {
         statusRepository.findByIdOrNull(id) ?: throw StatusNotFoundException("status id $id not found")

@@ -1,5 +1,7 @@
 package uz.shop.service
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import uz.shop.*
@@ -8,7 +10,7 @@ interface CategoryService {
     fun add(dto: CategoryDto): Result
     fun getOne(id: Long): CategoryDtoResponse
     fun edit(id: Long, dto: CategoryDto): Result
-    fun getAll(): List<CategoryDtoResponse>
+    fun getAll(pageable: Pageable, search: String?): Page<CategoryDtoResponse>
     fun delete(id: Long): Result
 }
 
@@ -70,9 +72,13 @@ class CategoryServiceImpl(
         Result("data edit successfully")
     }
 
-    override fun getAll(): List<CategoryDtoResponse> =
-        categoryRepository.findAll().map(CategoryDtoResponse.Companion::toResponse)
+    override fun getAll(pageable: Pageable, search: String?): Page<CategoryDtoResponse> =
 
+        if (search != null) {
+            categoryRepository.findAllBySearch(search, pageable).map(CategoryDtoResponse.Companion::toResponse)
+        } else {
+            categoryRepository.findAll(pageable).map(CategoryDtoResponse.Companion::toResponse)
+        }
 
     override fun delete(id: Long): Result {
         categoryRepository.findByIdOrNull(id)

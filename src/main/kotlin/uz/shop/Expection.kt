@@ -74,8 +74,6 @@ class UsernameExistException(msg: String) : BaseException(msg) {
     }
 }
 
-
-
 class AttributeNameExistException(msg: String) : BaseException(msg) {
     override fun errorCode() = ErrorCode.ATTRIBUTE_NAME_EXIST
     override fun getModel(): ErrorMessageModel {
@@ -205,6 +203,33 @@ class UserCardNotFoundException(msg: String) : BaseException(msg) {
     }
 }
 
+class ProductQuantityIsNotEnoughException(msg: String) : BaseException(msg) {
+    override fun errorCode() = ErrorCode.PRODUCT_QUANTITY_NOT_FOUND
+    override fun getModel(): ErrorMessageModel {
+        return ErrorMessageModel(errorCode().code, message)
+    }
+}
+
+class OrderNotFoundException(msg: String) : BaseException(msg) {
+    override fun errorCode() = ErrorCode.ORDER_NOT_FOUND
+    override fun getModel(): ErrorMessageModel {
+        return ErrorMessageModel(errorCode().code, message)
+    }
+}
+
+class FileAttachmentNotFoundException(msg: String) : BaseException(msg) {
+    override fun errorCode() = ErrorCode.FILE_ATTACHMENT_NOT_FOUND
+    override fun getModel(): ErrorMessageModel {
+        return ErrorMessageModel(errorCode().code, message)
+    }
+}
+
+class FileAttachmentExistException(msg: String) : BaseException(msg) {
+    override fun errorCode() = ErrorCode.FILE_ATTACHMENT_EXIST
+    override fun getModel(): ErrorMessageModel {
+        return ErrorMessageModel(errorCode().code, message)
+    }
+}
 
 class ErrorMessageModel(
     var status: Int? = null,

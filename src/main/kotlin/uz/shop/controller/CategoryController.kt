@@ -18,8 +18,8 @@ class CategoryController(
     @GetMapping("/{id}")
     fun getOne(@PathVariable id: Long) = categoryService.getOne(id)
 
-    @GetMapping("/all")
-    fun getAll(pageable: Pageable) = categoryService.getAll()
+    @GetMapping("/peagable")
+    fun getAll(pageable: Pageable, search: String?) = categoryService.getAll(pageable,search)
 
     @PutMapping("/{id}")
     fun edit(@Valid @RequestBody dto: CategoryDto, @PathVariable id: Long) = categoryService.edit(id, dto)
